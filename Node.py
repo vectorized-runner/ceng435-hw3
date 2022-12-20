@@ -105,10 +105,17 @@ def on_data_received(data):
     global last_message_time
     last_message_time = datetime.now()
 
-    # here we go, actual implementation
+    other_port, str_distances = data
+    value_dict = {}
+    for key in str_distances.keys():
+        value_dict[eval(key)] = eval(str_distances[key])
 
-    print(f"Data Received: {data}")
-    # Todo:
+    update_distances(other_port, value_dict)
+    return
+
+
+def update_distances(other_port, other_distances):
+    print(f"Data Received: {other_port}, {other_distances}")
     return
 
 
