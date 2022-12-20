@@ -54,12 +54,19 @@ def send_to_all_neighbors(data, neighbors):
 def send_data(data, port):
     print("send data begin")
 
-    json_str = json.dumps(data)
+    str_data = {}
+
+    for key in data.keys():
+        str_key = str(key)
+        str_value = str(data[key])
+        str_data[str_key] = str_value
+
+    json_str = json.dumps(str_data)
     if len(json_str) == 0:
-        raise Exception(f"Json length is zero. {data}")
+        raise Exception(f"Json length is zero. {str_data}")
 
     print(f"Sending data: {json_str}")
-    
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
