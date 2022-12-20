@@ -54,11 +54,16 @@ def send_to_all_neighbors(data, neighbors):
 def send_data(data, port):
     print("send data begin")
 
+    json_str = json.dumps(data)
+    if len(json_str) == 0:
+        raise Exception(f"Json length is zero. {data}")
+
+    print(f"Sending data: {json_str}")
+    
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
         s.connect((host, port))
-        json_str = json.dumps(data)
         s.sendall(json_str.encode("utf-8"))
     except:
         s.close()
