@@ -11,6 +11,7 @@ last_message_time = None
 program_exit = False
 self_port = -1
 node_count = -1
+neighbors = []
 distances = {}
 start_node = 3000
 
@@ -27,7 +28,8 @@ def parse_file(file_name):
 
     global node_count
     node_count = int(lines[0])
-    neighbors = []
+
+    global neighbors
 
     for x in range(1, len(lines)):
         line = lines[x]
@@ -40,17 +42,18 @@ def parse_file(file_name):
     return neighbors
 
 
-def send_to_all_neighbors(neighbors):
-    while not program_exit and len(neighbors) > 0:
+def send_to_all_neighbors():
+    to_send = neighbors.copy()
+    while not program_exit and len(to_send) > 0:
         successful = []
 
-        for neighbor in neighbors:
+        for neighbor in to_send:
             is_successful = send_data(neighbor)
             if is_successful:
                 successful.append(neighbor)
 
         for item in successful:
-            neighbors.remove(item)
+            to_send.remove(item)
 
         # Wait 1s before trying again
         time.sleep(1)
@@ -185,10 +188,9 @@ def program():
 
     file_name = f"first/{self_port}.costs"
     # Todo: update file name
-    neighbors = parse_file(file_name)
+    parse_file(file_name)
 
-    copy_neighbors = neighbors.copy()
-    thread_send = threading.Thread(target=send_to_all_neighbors, args=(copy_neighbors,))
+    thread_send = threading.Thread(target=send_to_all_neighbors)
     thread_send.start()
 
     # todo: kill this thread
