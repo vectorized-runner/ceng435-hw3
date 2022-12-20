@@ -38,7 +38,6 @@ def parse_file(file_name, port):
 
 def send_to_all_neighbors(data, neighbors):
     while not program_exit and len(neighbors) > 0:
-        print("try again.")
         successful = []
 
         for neighbor in neighbors:
@@ -56,7 +55,7 @@ def send_to_all_neighbors(data, neighbors):
 
 
 def send_data(data, port):
-    print("send data begin")
+    # print("send data begin")
 
     str_data = {}
 
@@ -80,17 +79,18 @@ def send_data(data, port):
         s.close()
         return False
 
-    print("send data end")
+    # print("send data end")
     s.close()
     return True
 
 
 def listen_to_connection(connection):
-    print("start listening to connection...")
+    # print("start listening to connection...")
+
     while not program_exit:
         data_str = connection.recv(1024).decode("utf-8")
         if len(data_str) == 0:
-            print("Close connection as received zero length.")
+            # print("Close connection as received zero length.")
             connection.close()
             break
 
@@ -111,7 +111,8 @@ def on_data_received(data):
 
 
 def listen_to_messages(port):
-    print("start listening to messages...")
+    # print("start listening to messages...")
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
     s.listen()
@@ -142,7 +143,7 @@ def program():
         return
 
     port = int(sys.argv[1])
-    print(f"Port is: {port}")
+    # print(f"Port is: {port}")
 
     file_name = f"first/{port}.costs"
     # Todo: update file name
@@ -164,17 +165,9 @@ def program():
         current_time = datetime.now()
         seconds_passed = timedelta.total_seconds(current_time - last_message_time)
         if seconds_passed > 5:
-            print("Closing the program...")
             print_distances(table, port, node_count)
             program_exit = True
 
-    # Stages:
-    # Read neighborhood info from .costs
-    # Send distance vector to every neighbor
-    # Listen from updates from all neighbors
-    # if no update happens, close all connections and print
-
-    print("Finished")
     return
 
 
