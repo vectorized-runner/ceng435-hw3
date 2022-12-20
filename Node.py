@@ -187,8 +187,7 @@ def program():
     self_port = int(sys.argv[1])
     print(f"Port is: {self_port}")
 
-    file_name = f"first/{self_port}.costs"
-    # Todo: update file name
+    file_name = f"{self_port}.costs"
     parse_file(file_name)
 
     broadcast_distances()
