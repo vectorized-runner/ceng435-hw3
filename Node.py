@@ -9,21 +9,21 @@ from datetime import timedelta
 host = "127.0.0.1"
 last_message_time = None
 program_exit = False
+self_port = None
+distances = {}
 
-
-def write_table(x, y, table, cost):
-    table[(x, y)] = cost
-    table[(y, x)] = cost
+def update_distance(x, y, cost):
+    distances[(x, y)] = cost
+    distances[(y, x)] = cost
     return
 
 
-def parse_file(file_name, port):
+def parse_file(file_name):
     f = open(file_name, "r")
     lines = f.read().splitlines()
 
     node_count = int(lines[0])
     neighbors = []
-    table = {}
 
     for x in range(1, len(lines)):
         line = lines[x]
@@ -31,17 +31,17 @@ def parse_file(file_name, port):
         other_port = int(sp[0])
         cost = int(sp[1])
         neighbors.append(other_port)
-        write_table(other_port, port, table, cost)
+        update_distance(other_port, self_port, cost)
 
-    return node_count, neighbors, table
+    return node_count, neighbors
 
 
-def send_to_all_neighbors(data, neighbors):
+def send_to_all_neighbors(neighbors):
     while not program_exit and len(neighbors) > 0:
         successful = []
 
         for neighbor in neighbors:
-            is_successful = send_data(data, neighbor)
+            is_successful = send_data(neighbor)
             if is_successful:
                 successful.append(neighbor)
 
@@ -54,19 +54,14 @@ def send_to_all_neighbors(data, neighbors):
     return
 
 
-def send_data(data, send_port):
+def send_data(send_port):
     # print("send data begin")
-
-    self_port, table = data
-
-    print(type(self_port))
-    print(type(table))
 
     str_table = {}
 
-    for key in table.keys():
+    for key in distances.keys():
         str_key = str(key)
-        str_value = str(table[key])
+        str_value = str(distances[key])
         str_table[str_key] = str_value
 
     json_str = json.dumps([self_port, str_table])
@@ -110,16 +105,18 @@ def on_data_received(data):
     global last_message_time
     last_message_time = datetime.now()
 
+    # here we go, actual implementation
+
     print(f"Data Received: {data}")
     # Todo:
     return
 
 
-def listen_to_messages(port):
+def listen_to_messages():
     # print("start listening to messages...")
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((host, port))
+    s.bind((host, self_port))
     s.listen()
 
     while not program_exit:
@@ -130,11 +127,11 @@ def listen_to_messages(port):
     return
 
 
-def print_distances(table, self_port, node_count):
+def print_distances(node_count):
     for x in range(3000, 3000 + node_count):
         key = (self_port, x)
-        if key in table:
-            distance = table[key]
+        if key in distances:
+            distance = distances[key]
             print(f"{self_port} -{x} | {distance}")
 
     return
@@ -147,20 +144,20 @@ def program():
         print(f"Incorrect amount of args: {len(sys.argv)}")
         return
 
-    port = int(sys.argv[1])
-    # print(f"Port is: {port}")
+    global self_port
+    self_port = int(sys.argv[1])
+    print(f"Port is: {self_port}")
 
-    file_name = f"first/{port}.costs"
+    file_name = f"first/{self_port}.costs"
     # Todo: update file name
-    node_count, neighbors, table = parse_file(file_name, port)
-    data_send = [port, table]
+    node_count, neighbors = parse_file(file_name)
 
     copy_neighbors = neighbors.copy()
 
-    thread_send = threading.Thread(target=send_to_all_neighbors, args=(data_send, copy_neighbors,))
+    thread_send = threading.Thread(target=send_to_all_neighbors, args=(copy_neighbors,))
     thread_send.start()
 
-    thread_listen = threading.Thread(target=listen_to_messages, args=(port,))
+    thread_listen = threading.Thread(target=listen_to_messages)
     thread_listen.start()
 
     global last_message_time
@@ -171,7 +168,7 @@ def program():
         current_time = datetime.now()
         seconds_passed = timedelta.total_seconds(current_time - last_message_time)
         if seconds_passed > 5:
-            print_distances(table, port, node_count)
+            print_distances(node_count)
             program_exit = True
 
     return
@@ -179,3 +176,4 @@ def program():
 
 if __name__ == '__main__':
     program()
+    print("done")
