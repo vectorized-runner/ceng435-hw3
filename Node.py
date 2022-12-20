@@ -157,6 +157,7 @@ def program():
     thread_send = threading.Thread(target=send_to_all_neighbors, args=(copy_neighbors,))
     thread_send.start()
 
+    # todo: kill this thread
     thread_listen = threading.Thread(target=listen_to_messages)
     thread_listen.start()
 
