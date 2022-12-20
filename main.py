@@ -13,8 +13,7 @@ def create_table(node_count):
 
     for x in range(initial_node, initial_node + node_count):
         for y in range(initial_node, initial_node + node_count):
-            table[(x, y)] = inf
-            table[(y, x)] = inf
+            write_table(x, y, table, inf)
 
     return table
 
@@ -25,7 +24,14 @@ def write_table(x, y, table, cost):
     return
 
 
-def parse_file(file_name):
+def update_cost(x, y, table, cost):
+    current_cost = table[(x, y)]
+    if cost < current_cost:
+        write_table(x, y, table, cost)
+    return
+
+
+def parse_file(file_name, port):
     f = open(file_name, "r")
     lines = f.read().splitlines()
 
@@ -36,13 +42,11 @@ def parse_file(file_name):
     for x in range(1, len(lines)):
         line = lines[x]
         sp = line.split(" ")
-        port = int(sp[0])
+        other_port = int(sp[0])
         cost = int(sp[1])
-        print(port)
-        print(cost)
+        update_cost(other_port, port, table, cost)
 
-
-    return
+    return table
 
 
 def program():
@@ -57,7 +61,9 @@ def program():
 
     file_name = f"first/{port}.costs"
     # Todo: update file name
-    parse_file(file_name)
+    table = parse_file(file_name, port)
+
+    print(table)
 
     host = "127.0.0.1"
 
