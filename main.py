@@ -1,16 +1,31 @@
-# This is a sample Python script.
+import socket
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    print("Start running")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # Todo: How do we assign a port to this?
+    port = 3000
+    host = "127.0.0.1"
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, port))
+        s.listen()
+        conn, addr = s.accept()
+        with conn:
+            print(f"Connected by {addr}")
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)
+
+
+    # Stages:
+    # Read neighborhood info from .costs
+    # Send distance vector to every neighbor
+    # Listen from updates from all neighbors
+    # if no update happens, close all connections and print
+
+
+    print("Finished")
+
