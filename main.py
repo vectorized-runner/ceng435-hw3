@@ -59,7 +59,7 @@ def send_data(data, port):
     try:
         s.connect((host, port))
         json_str = json.dumps(data)
-        s.sendall(json_str)
+        s.sendall(json_str.encode("utf-8"))
     except:
         s.close()
         return False
