@@ -2,6 +2,10 @@ import socket
 import sys
 
 
+def parse_file():
+
+    return
+
 def program():
     print("Start running")
 
@@ -14,17 +18,22 @@ def program():
 
     host = "127.0.0.1"
 
+    connections = []
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((host, port))
         s.listen()
-        conn, addr = s.accept()
-        with conn:
+        connection, addr = s.accept()
+        with connection:
+
             print(f"Connected by {addr}")
             while True:
-                data = conn.recv(1024)
+                data = connection.recv(1024)
                 if not data:
                     break
-                conn.sendall(data)
+
+                # TODO: Send your table to others
+                connection.sendall(data)
 
     # Stages:
     # Read neighborhood info from .costs
