@@ -9,8 +9,11 @@ from datetime import timedelta
 host = "127.0.0.1"
 last_message_time = None
 program_exit = False
-self_port = None
+self_port = -1
+node_count = -1
 distances = {}
+start_node = 3000
+
 
 def update_distance(x, y, cost):
     distances[(x, y)] = cost
@@ -22,6 +25,7 @@ def parse_file(file_name):
     f = open(file_name, "r")
     lines = f.read().splitlines()
 
+    global node_count
     node_count = int(lines[0])
     neighbors = []
 
@@ -33,7 +37,7 @@ def parse_file(file_name):
         neighbors.append(other_port)
         update_distance(other_port, self_port, cost)
 
-    return node_count, neighbors
+    return neighbors
 
 
 def send_to_all_neighbors(neighbors):
@@ -55,8 +59,6 @@ def send_to_all_neighbors(neighbors):
 
 
 def send_data(send_port):
-    # print("send data begin")
-
     str_table = {}
 
     for key in distances.keys():
@@ -68,7 +70,7 @@ def send_data(send_port):
     if len(json_str) == 0:
         raise Exception(f"Json length is zero.")
 
-    print(f"Sending data: {json_str}")
+    # print(f"Sending data: {json_str}")
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -85,12 +87,12 @@ def send_data(send_port):
 
 
 def listen_to_connection(connection):
-    # print("start listening to connection...")
+    print("start listening to connection...")
 
     while not program_exit:
         data_str = connection.recv(1024).decode("utf-8")
         if len(data_str) == 0:
-            # print("Close connection as received zero length.")
+            print("Close connection as received zero length.")
             connection.close()
             break
 
@@ -134,8 +136,8 @@ def listen_to_messages():
     return
 
 
-def print_distances(node_count):
-    for x in range(3000, 3000 + node_count):
+def print_distances():
+    for x in range(start_node, start_node + node_count):
         key = (self_port, x)
         if key in distances:
             distance = distances[key]
@@ -157,7 +159,7 @@ def program():
 
     file_name = f"first/{self_port}.costs"
     # Todo: update file name
-    node_count, neighbors = parse_file(file_name)
+    neighbors = parse_file(file_name)
 
     copy_neighbors = neighbors.copy()
 
@@ -176,7 +178,7 @@ def program():
         current_time = datetime.now()
         seconds_passed = timedelta.total_seconds(current_time - last_message_time)
         if seconds_passed > 5:
-            print_distances(node_count)
+            print_distances()
             program_exit = True
 
     return
