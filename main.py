@@ -67,22 +67,23 @@ def send_data(data, port):
     return True
 
 
-def listen_to_messages():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((host, port))
-        s.listen()
+def listen_to_connection(connection):
+    while True:
+        data = connection.recv(1024)
+        print(f"Data Received: {data}")
+
+    return
+
+
+def listen_to_messages(port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host, port))
+    s.listen()
+
+    while True:
         connection, addr = s.accept()
-        with connection:
-
-            print(f"Connected by {addr}")
-            while True:
-                data = connection.recv(1024)
-                if not data:
-                    break
-
-                print("I should be sending data now!")
-                # TODO: Send your table to others
-                connection.sendall(data)
+        cThread = threading.Thread(target=listen_to_connection, args=(connection,))
+        cThread.start()
 
     return
 
@@ -106,7 +107,7 @@ def program():
     thread_send = threading.Thread(target=send_to_all_neighbors, args=(table, copy_neighbors,))
     thread_send.start()
 
-    thread_listen = threading.Thread()
+    thread_listen = threading.Thread(target=listen_to_messages, args=(port,))
     thread_listen.start()
 
     # Todo: Here we do the waiting...
@@ -114,8 +115,6 @@ def program():
     print("xdd")
 
     return
-
-
 
     # Stages:
     # Read neighborhood info from .costs
