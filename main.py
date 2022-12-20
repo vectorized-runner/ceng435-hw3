@@ -1,3 +1,4 @@
+import json
 import socket
 import sys
 import threading
@@ -57,7 +58,8 @@ def send_data(data, port):
 
     try:
         s.connect((host, port))
-        s.sendall(data)
+        json_str = json.dumps(data)
+        s.sendall(json_str)
     except:
         s.close()
         return False
