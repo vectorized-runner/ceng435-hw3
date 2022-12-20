@@ -1,6 +1,7 @@
 import socket
 import sys
 import threading
+import time
 
 host = "127.0.0.1"
 
@@ -16,6 +17,7 @@ def parse_file(file_name, port):
     lines = f.read().splitlines()
 
     node_count = int(lines[0])
+    neighbors = []
     table = {}
 
     for x in range(1, len(lines)):
@@ -23,30 +25,27 @@ def parse_file(file_name, port):
         sp = line.split(" ")
         other_port = int(sp[0])
         cost = int(sp[1])
+        neighbors.append(other_port)
         write_table(other_port, port, table, cost)
 
-    return node_count, table
+    return node_count, neighbors, table
 
 
-def get_ports_to_connect(node_count, self_port):
-    # This is constant, we're starting from 3000
-    start_node = 3000
-    result = []
+def send_to_all_neighbors(data, neighbors):
+    while len(neighbors) > 0:
+        print("try again.")
+        successful = []
 
-    for x in range(start_node, start_node + node_count):
-        result.append(x)
+        for neighbor in neighbors:
+            is_successful = send_data(data, neighbor)
+            if is_successful:
+                successful.append(neighbor)
 
-    result.remove(self_port)
-    return result
+        for item in successful:
+            neighbors.remove(item)
 
-
-def send_data_to_ports(data, ports):
-    # TODO: send to the others too
-
-    send_port = ports[0]
-
-    thread = threading.Thread(target=send_data, args=(data, send_port,))
-    thread.start()
+        # Wait 100ms before trying again
+        time.sleep(0.1)
 
     return
 
@@ -73,14 +72,14 @@ def program():
 
     file_name = f"first/{port}.costs"
     # Todo: update file name
-    node_count, table = parse_file(file_name, port)
+    node_count, neighbors, table = parse_file(file_name, port)
 
-    ports_to_connect = get_ports_to_connect(node_count, port)
-    print(ports_to_connect)
+    copy_neighbors = neighbors.copy()
 
-    print(table)
+    thread = threading.Thread(target=send_to_all_neighbors, args=(table, copy_neighbors,))
+    thread.start()
 
-    send_data_to_ports(table, ports_to_connect)
+    print("xdd")
 
     return
 
