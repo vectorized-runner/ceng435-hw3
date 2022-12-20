@@ -72,7 +72,8 @@ def send_data(data, port):
 def listen_to_connection(connection):
     print("start listening to connection...")
     while True:
-        data = connection.recv(1024)
+        json_data = connection.recv(1024)
+        data = json.loads(json_data)
         print(f"Data Received: {data}")
 
     return
