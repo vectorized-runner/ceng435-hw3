@@ -172,7 +172,8 @@ def print_distances():
 
 
 def broadcast_distances():
-    # todo
+    thread_send = threading.Thread(target=send_to_all_neighbors)
+    thread_send.start()
     return
 
 def program():
@@ -190,8 +191,7 @@ def program():
     # Todo: update file name
     parse_file(file_name)
 
-    thread_send = threading.Thread(target=send_to_all_neighbors)
-    thread_send.start()
+    broadcast_distances()
 
     # todo: kill this thread
     thread_listen = threading.Thread(target=listen_to_messages)
