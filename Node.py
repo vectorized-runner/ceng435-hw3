@@ -54,26 +54,31 @@ def send_to_all_neighbors(data, neighbors):
     return
 
 
-def send_data(data, port):
+def send_data(data, send_port):
     # print("send data begin")
 
-    str_data = {}
+    self_port, table = data
 
-    for key in data.keys():
+    print(type(self_port))
+    print(type(table))
+
+    str_table = {}
+
+    for key in table.keys():
         str_key = str(key)
-        str_value = str(data[key])
-        str_data[str_key] = str_value
+        str_value = str(table[key])
+        str_table[str_key] = str_value
 
-    json_str = json.dumps(str_data)
+    json_str = json.dumps([self_port, str_table])
     if len(json_str) == 0:
-        raise Exception(f"Json length is zero. {str_data}")
+        raise Exception(f"Json length is zero.")
 
     print(f"Sending data: {json_str}")
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
-        s.connect((host, port))
+        s.connect((host, send_port))
         s.sendall(json_str.encode("utf-8"))
     except:
         s.close()
@@ -148,10 +153,11 @@ def program():
     file_name = f"first/{port}.costs"
     # Todo: update file name
     node_count, neighbors, table = parse_file(file_name, port)
+    data_send = [port, table]
 
     copy_neighbors = neighbors.copy()
 
-    thread_send = threading.Thread(target=send_to_all_neighbors, args=(table, copy_neighbors,))
+    thread_send = threading.Thread(target=send_to_all_neighbors, args=(data_send, copy_neighbors,))
     thread_send.start()
 
     thread_listen = threading.Thread(target=listen_to_messages, args=(port,))
