@@ -39,6 +39,9 @@ def parse_file(file_name):
         neighbors.append(other_port)
         update_distance(other_port, self_port, cost)
 
+    global distances
+    distances[(self_port, self_port)] = 0
+
     return neighbors
 
 
