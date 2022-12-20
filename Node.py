@@ -117,7 +117,28 @@ def on_data_received(data):
 
 
 def update_distances(other_port, other_distances):
-    print(f"Data Received: {other_port}, {other_distances}")
+    distance_to_port = distances[(self_port, other_port)]
+    updated = False
+
+    for x in range(start_node, start_node + node_count):
+        other_cost = other_distances[(other_port, x)]
+        new_cost = other_cost + distance_to_port
+
+        if (self_port, x) not in distances:
+            # Adding for the first time
+            update_distance(self_port, x, new_cost)
+            updated = True
+        else:
+            current_cost = distances[(self_port, x)]
+            if new_cost < current_cost:
+                update_distance(self_port, x, new_cost)
+                updated = True
+
+    if updated:
+        broadcast_distances()
+        return
+
+    print("update distances!")
     return
 
 
@@ -146,6 +167,10 @@ def print_distances():
     return
 
 
+def broadcast_distances():
+    # todo
+    return
+
 def program():
     print("Start running")
 
@@ -162,7 +187,6 @@ def program():
     neighbors = parse_file(file_name)
 
     copy_neighbors = neighbors.copy()
-
     thread_send = threading.Thread(target=send_to_all_neighbors, args=(copy_neighbors,))
     thread_send.start()
 
