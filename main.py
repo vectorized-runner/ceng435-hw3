@@ -2,7 +2,23 @@ import socket
 import sys
 
 
-def parse_file():
+def parse_file(file_name):
+    f = open(file_name, "r")
+
+    # Port numbers start from 3000
+    initial_node = 3000
+
+    lines = f.read().splitlines()
+
+    node_count = lines[0]
+
+    for x in range(1, len(lines)):
+        line = lines[x]
+        sp = line.split(" ")
+        port = int(sp[0])
+        cost = int(sp[1])
+        print(port)
+        print(cost)
 
     return
 
@@ -15,6 +31,12 @@ def program():
 
     port = int(sys.argv[1])
     print(f"Port is: {port}")
+
+    file_name = f"first/{port}.costs"
+    # Todo: update file name
+    parse_file(file_name)
+
+
 
     host = "127.0.0.1"
 
