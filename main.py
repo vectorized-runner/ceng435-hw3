@@ -52,12 +52,19 @@ def send_to_all_neighbors(data, neighbors):
 
 def send_data(data, port):
     print("send data begin")
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
-    s.sendall(data)
-    s.close()
+
+    try:
+        s.connect((host, port))
+        s.sendall(data)
+    except:
+        s.close()
+        return False
+
     print("send data end")
-    return
+    s.close()
+    return True
 
 
 def program():
