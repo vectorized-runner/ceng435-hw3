@@ -3,8 +3,12 @@ import socket
 import sys
 import threading
 import time
+from datetime import datetime
+from datetime import timedelta
 
 host = "127.0.0.1"
+last_message_time = None
+program_exit = False
 
 
 def write_table(x, y, table, cost):
@@ -33,7 +37,7 @@ def parse_file(file_name, port):
 
 
 def send_to_all_neighbors(data, neighbors):
-    while len(neighbors) > 0:
+    while not program_exit and len(neighbors) > 0:
         print("try again.")
         successful = []
 
@@ -83,7 +87,7 @@ def send_data(data, port):
 
 def listen_to_connection(connection):
     print("start listening to connection...")
-    while True:
+    while not program_exit:
         data_str = connection.recv(1024).decode("utf-8")
         if len(data_str) == 0:
             print("Close connection as received zero length.")
@@ -93,10 +97,14 @@ def listen_to_connection(connection):
         data = json.loads(data_str)
         on_data_received(data)
 
+    connection.close()
     return
 
 
 def on_data_received(data):
+    global last_message_time
+    last_message_time = datetime.now()
+
     print(f"Data Received: {data}")
     # Todo:
     return
@@ -108,7 +116,7 @@ def listen_to_messages(port):
     s.bind((host, port))
     s.listen()
 
-    while True:
+    while not program_exit:
         connection, addr = s.accept()
         cThread = threading.Thread(target=listen_to_connection, args=(connection,))
         cThread.start()
@@ -138,11 +146,18 @@ def program():
     thread_listen = threading.Thread(target=listen_to_messages, args=(port,))
     thread_listen.start()
 
-    # Todo: Here we do the waiting...
+    global last_message_time
+    last_message_time = datetime.now()
 
-    print("xdd")
-
-    return
+    while True:
+        current_time = datetime.now()
+        seconds_passed = timedelta.total_seconds(current_time - last_message_time)
+        if seconds_passed > 5:
+            print("Closing the program...")
+            global program_exit
+            program_exit = True
+            # todo: print the result
+            break
 
     # Stages:
     # Read neighborhood info from .costs
