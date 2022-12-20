@@ -121,18 +121,19 @@ def update_distances(other_port, other_distances):
     updated = False
 
     for x in range(start_node, start_node + node_count):
-        other_cost = other_distances[(other_port, x)]
-        new_cost = other_cost + distance_to_port
+        if (other_port, x) in other_distances:
+            other_cost = other_distances[(other_port, x)]
+            new_cost = other_cost + distance_to_port
 
-        if (self_port, x) not in distances:
-            # Adding for the first time
-            update_distance(self_port, x, new_cost)
-            updated = True
-        else:
-            current_cost = distances[(self_port, x)]
-            if new_cost < current_cost:
+            if (self_port, x) not in distances:
+                # Adding for the first time
                 update_distance(self_port, x, new_cost)
                 updated = True
+            else:
+                current_cost = distances[(self_port, x)]
+                if new_cost < current_cost:
+                    update_distance(self_port, x, new_cost)
+                    updated = True
 
     if updated:
         broadcast_distances()
