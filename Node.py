@@ -159,16 +159,14 @@ def program():
     global last_message_time
     last_message_time = datetime.now()
 
-    while True:
+    global program_exit
+    while not program_exit:
         current_time = datetime.now()
         seconds_passed = timedelta.total_seconds(current_time - last_message_time)
         if seconds_passed > 5:
             print("Closing the program...")
             print_distances(table, port, node_count)
-            global program_exit
             program_exit = True
-            # todo: print the result
-            break
 
     # Stages:
     # Read neighborhood info from .costs
