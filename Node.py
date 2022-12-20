@@ -90,12 +90,12 @@ def send_data(send_port):
 
 
 def listen_to_connection(connection):
-    print("start listening to connection...")
+    # print("start listening to connection...")
 
     while not program_exit:
         data_str = connection.recv(1024).decode("utf-8")
         if len(data_str) == 0:
-            print("Close connection as received zero length.")
+            # print("Close connection as received zero length.")
             connection.close()
             break
 
@@ -142,7 +142,7 @@ def update_distances(other_port, other_distances):
         broadcast_distances()
         return
 
-    print("update distances!")
+    # print("update distances!")
     return
 
 
@@ -175,6 +175,7 @@ def broadcast_distances():
     thread_send = threading.Thread(target=send_to_all_neighbors)
     thread_send.start()
     return
+
 
 def program():
     print("Start running")
@@ -212,4 +213,4 @@ def program():
 
 if __name__ == '__main__':
     program()
-    print("done")
+    # print("done")
