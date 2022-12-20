@@ -13,7 +13,6 @@ def parse_file(file_name, port):
     lines = f.read().splitlines()
 
     node_count = int(lines[0])
-
     table = { }
 
     for x in range(1, len(lines)):
@@ -23,8 +22,19 @@ def parse_file(file_name, port):
         cost = int(sp[1])
         write_table(other_port, port, table, cost)
 
-    return table
+    return node_count, table
 
+
+def get_ports_to_connect(node_count, self_port):
+    # This is constant, we're starting from 3000
+    start_node = 3000
+    result = []
+
+    for x in range(start_node, start_node + node_count):
+        result.append(x)
+
+    result.remove(self_port)
+    return result
 
 def program():
     print("Start running")
@@ -38,11 +48,16 @@ def program():
 
     file_name = f"first/{port}.costs"
     # Todo: update file name
-    table = parse_file(file_name, port)
+    node_count, table = parse_file(file_name, port)
+
+    ports_to_connect = get_ports_to_connect(node_count, port)
+    print(ports_to_connect)
 
     print(table)
 
     host = "127.0.0.1"
+
+    return
 
     connections = []
 
