@@ -1,5 +1,8 @@
 import socket
 import sys
+import threading
+
+host = "127.0.0.1"
 
 
 def write_table(x, y, table, cost):
@@ -13,7 +16,7 @@ def parse_file(file_name, port):
     lines = f.read().splitlines()
 
     node_count = int(lines[0])
-    table = { }
+    table = {}
 
     for x in range(1, len(lines)):
         line = lines[x]
@@ -36,6 +39,28 @@ def get_ports_to_connect(node_count, self_port):
     result.remove(self_port)
     return result
 
+
+def send_data_to_ports(data, ports):
+    # TODO: send to the others too
+
+    send_port = ports[0]
+
+    thread = threading.Thread(target=send_data, args=(data, send_port,))
+    thread.start()
+
+    return
+
+
+def send_data(data, port):
+    print("send data begin")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host, port))
+    s.sendall(data)
+    s.close()
+    print("send data end")
+    return
+
+
 def program():
     print("Start running")
 
@@ -55,7 +80,7 @@ def program():
 
     print(table)
 
-    host = "127.0.0.1"
+    send_data_to_ports(table, ports_to_connect)
 
     return
 
