@@ -2,15 +2,36 @@ import socket
 import sys
 
 
-def parse_file(file_name):
-    f = open(file_name, "r")
+def create_table(node_count):
+    table = { }
+
+    # Use a very high value instead of infinity
+    inf = 100_000
 
     # Port numbers start from 3000
     initial_node = 3000
 
+    for x in range(initial_node, initial_node + node_count):
+        for y in range(initial_node, initial_node + node_count):
+            table[(x, y)] = inf
+            table[(y, x)] = inf
+
+    return table
+
+
+def write_table(x, y, table, cost):
+    table[(x, y)] = cost
+    table[(y, x)] = cost
+    return
+
+
+def parse_file(file_name):
+    f = open(file_name, "r")
     lines = f.read().splitlines()
 
-    node_count = lines[0]
+    node_count = int(lines[0])
+
+    table = create_table(node_count)
 
     for x in range(1, len(lines)):
         line = lines[x]
@@ -20,7 +41,9 @@ def parse_file(file_name):
         print(port)
         print(cost)
 
+
     return
+
 
 def program():
     print("Start running")
@@ -35,8 +58,6 @@ def program():
     file_name = f"first/{port}.costs"
     # Todo: update file name
     parse_file(file_name)
-
-
 
     host = "127.0.0.1"
 
