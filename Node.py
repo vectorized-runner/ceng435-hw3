@@ -155,11 +155,15 @@ def listen_to_messages():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, self_port))
     s.listen()
+    s.settimeout(5)
 
     while not program_exit:
-        connection, addr = s.accept()
-        cThread = threading.Thread(target=listen_to_connection, args=(connection,))
-        cThread.start()
+        try:
+            connection, addr = s.accept()
+            cThread = threading.Thread(target=listen_to_connection, args=(connection,))
+            cThread.start()
+        except socket.timeout:
+            pass
 
     return
 
