@@ -124,6 +124,16 @@ def listen_to_messages(port):
     return
 
 
+def print_distances(table, self_port, node_count):
+    for x in range(3000, 3000 + node_count):
+        key = (self_port, x)
+        if key in table:
+            distance = table[key]
+            print(f"{self_port} -{x} | {distance}")
+
+    return
+
+
 def program():
     print("Start running")
 
@@ -154,6 +164,7 @@ def program():
         seconds_passed = timedelta.total_seconds(current_time - last_message_time)
         if seconds_passed > 5:
             print("Closing the program...")
+            print_distances(table, port, node_count)
             global program_exit
             program_exit = True
             # todo: print the result
