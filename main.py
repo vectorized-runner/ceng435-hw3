@@ -67,6 +67,26 @@ def send_data(data, port):
     return True
 
 
+def listen_to_messages():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, port))
+        s.listen()
+        connection, addr = s.accept()
+        with connection:
+
+            print(f"Connected by {addr}")
+            while True:
+                data = connection.recv(1024)
+                if not data:
+                    break
+
+                print("I should be sending data now!")
+                # TODO: Send your table to others
+                connection.sendall(data)
+
+    return
+
+
 def program():
     print("Start running")
 
@@ -83,30 +103,19 @@ def program():
 
     copy_neighbors = neighbors.copy()
 
-    thread = threading.Thread(target=send_to_all_neighbors, args=(table, copy_neighbors,))
-    thread.start()
+    thread_send = threading.Thread(target=send_to_all_neighbors, args=(table, copy_neighbors,))
+    thread_send.start()
+
+    thread_listen = threading.Thread()
+    thread_listen.start()
+
+    # Todo: Here we do the waiting...
 
     print("xdd")
 
     return
 
-    connections = []
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((host, port))
-        s.listen()
-        connection, addr = s.accept()
-        with connection:
-
-            print(f"Connected by {addr}")
-            while True:
-                data = connection.recv(1024)
-                if not data:
-                    break
-
-                print("I should be sending data now!")
-                # TODO: Send your table to others
-                connection.sendall(data)
 
     # Stages:
     # Read neighborhood info from .costs
