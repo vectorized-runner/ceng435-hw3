@@ -85,9 +85,20 @@ def listen_to_connection(connection):
     print("start listening to connection...")
     while True:
         data_str = connection.recv(1024).decode("utf-8")
-        data = json.loads(data_str)
-        print(f"Data Received: {data}")
+        if len(data_str) == 0:
+            print("Close connection as received zero length.")
+            connection.close()
+            break
 
+        data = json.loads(data_str)
+        on_data_received(data)
+
+    return
+
+
+def on_data_received(data):
+    print(f"Data Received: {data}")
+    # Todo:
     return
 
 
