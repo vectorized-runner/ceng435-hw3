@@ -181,7 +181,6 @@ def broadcast_distances():
 
 
 def program():
-    print("Start running")
 
     if len(sys.argv) != 2:
         print(f"Incorrect amount of args: {len(sys.argv)}")
@@ -189,7 +188,7 @@ def program():
 
     global self_port
     self_port = int(sys.argv[1])
-    print(f"Port is: {self_port}")
+    # print(f"Port is: {self_port}")
 
     file_name = f"{self_port}.costs"
     parse_file(file_name)
