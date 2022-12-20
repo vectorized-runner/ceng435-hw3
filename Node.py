@@ -55,8 +55,8 @@ def send_to_all_neighbors():
         for item in successful:
             to_send.remove(item)
 
-        # Wait 1s before trying again
-        time.sleep(1)
+        # Wait before trying again
+        time.sleep(0.1)
 
     return
 
