@@ -68,6 +68,7 @@ def send_data(data, port):
 
 
 def listen_to_connection(connection):
+    print("start listening to connection...")
     while True:
         data = connection.recv(1024)
         print(f"Data Received: {data}")
@@ -76,6 +77,7 @@ def listen_to_connection(connection):
 
 
 def listen_to_messages(port):
+    print("start listening to messages...")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
     s.listen()
